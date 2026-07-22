@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="rtl"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="12dp"
+    android:background="@drawable/widget_bg_square">
+
+    <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+        android:id="@+id/widget_date_primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="شنبه"
+        android:textColor="#AAAAAA"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+        android:id="@+id/widget_date_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="۱ تیر ۱۴۰۵"
+        android:textColor="#1A5E3A"
+        android:textSize="10.5sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/widget_divider" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+            android:id="@+id/widget_gear"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:gravity="center"
+            android:text="⚙"
+            android:textColor="#888888"
+            android:textSize="9.5sp" />
+        <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+            android:id="@+id/widget_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="خرج کرد امروز"
+            android:textColor="#888888"
+            android:textSize="9sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+            android:id="@+id/widget_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="۰"
+            android:textColor="#1A5E3A"
+            android:textSize="21sp"
+            android:textStyle="bold" />
+        <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:text="تومان"
+            android:textColor="#999999"
+            android:textSize="8.5sp" />
+    </LinearLayout>
+
+    <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+        android:id="@+id/widget_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="۰ مورد"
+        android:textColor="#BBBBBB"
+        android:textSize="8.5sp" />
+
+    <TextView
+        android:fontFamily="@font/vazirmatn_regular"
+        android:includeFontPadding="true"
+        android:id="@+id/widget_plus"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/widget_plus_bg"
+        android:gravity="center"
+        android:text="+"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
+</LinearLayout>
