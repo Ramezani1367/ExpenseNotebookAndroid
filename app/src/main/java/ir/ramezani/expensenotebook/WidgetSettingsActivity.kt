@@ -52,7 +52,6 @@ class WidgetSettingsActivity : Activity() {
             gravity = Gravity.CENTER
             textSize = 13f
             vazir?.let { typeface = it }
-            setOnClickListener { finish() }
         }
         header.addView(title, LinearLayout.LayoutParams(0, dp(26), 1f))
         header.addView(close, LinearLayout.LayoutParams(dp(34), dp(26)))
@@ -78,7 +77,7 @@ class WidgetSettingsActivity : Activity() {
                 finish()
             }
         }
-        val text = TextView(this).apply {
+        val labelView = TextView(this).apply {
             text = label
             textSize = 12f
             setTextColor(if (optionMode == currentMode) green else Color.rgb(85, 85, 85))
@@ -92,7 +91,7 @@ class WidgetSettingsActivity : Activity() {
             gravity = Gravity.CENTER
             vazir?.let { typeface = it }
         }
-        row.addView(text, LinearLayout.LayoutParams(0, dp(44), 1f))
+        row.addView(labelView, LinearLayout.LayoutParams(0, dp(44), 1f))
         row.addView(tick, LinearLayout.LayoutParams(dp(28), dp(44)))
         root.addView(row)
     }
