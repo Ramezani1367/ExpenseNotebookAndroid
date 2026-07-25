@@ -18,27 +18,52 @@ import android.widget.RemoteViews
 
 class ExpenseWidgetProvider : AppWidgetProvider() {
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
         updateWidgets(context, appWidgetManager, appWidgetIds)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
+
         if (intent.action != ACTION_WIDGET_BODY_TAP) return
 
         val now = SystemClock.elapsedRealtime()
-        val prefs = context.getSharedPreferences("widget_tap_state", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences(
+            "widget_tap_state",
+            Context.MODE_PRIVATE
+        )
+
         val previous = prefs.getLong(KEY_LAST_TAP, 0L)
+
         if (now - previous <= DOUBLE_TAP_WINDOW_MS) {
             prefs.edit().remove(KEY_LAST_TAP).apply()
-            val openIntent = Intent(context, MainActivity::class.java).apply {
-                action = "ir.ramezani.expensenotebook.OPEN_FROM_WIDGET_DOUBLE_TAP"
-                putExtra(MainActivity.EXTRA_OPEN_MODE, ExpenseDataUtils.currentMode(context))
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+
+            val openIntent = Intent(
+                context,
+                MainActivity::class.java
+            ).apply {
+                action =
+                    "ir.ramezani.expensenotebook.OPEN_FROM_WIDGET_DOUBLE_TAP"
+
+                putExtra(
+                    MainActivity.EXTRA_OPEN_MODE,
+                    ExpenseDataUtils.currentMode(context)
+                )
+
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
+
             context.startActivity(openIntent)
         } else {
-            prefs.edit().putLong(KEY_LAST_TAP, now).apply()
+            prefs.edit()
+                .putLong(KEY_LAST_TAP, now)
+                .apply()
         }
     }
 
@@ -48,64 +73,132 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle
     ) {
-        updateWidgets(context, appWidgetManager, intArrayOf(appWidgetId))
+        updateWidgets(
+            context,
+            appWidgetManager,
+            intArrayOf(appWidgetId)
+        )
     }
 
     companion object {
-        const val ACTION_WIDGET_BODY_TAP = "ir.ramezani.expensenotebook.WIDGET_BODY_TAP"
+
+        const val ACTION_WIDGET_BODY_TAP =
+            "ir.ramezani.expensenotebook.WIDGET_BODY_TAP"
+
         private const val KEY_LAST_TAP = "last_tap"
         private const val DOUBLE_TAP_WINDOW_MS = 420L
 
-        private val GREEN = Color.rgb(26, 94, 58)
         private val TEXT_DARK = Color.rgb(77, 77, 77)
         private val MUTED = Color.rgb(136, 136, 136)
         private val LIGHT = Color.rgb(210, 210, 210)
         private val DATE_GREY = Color.rgb(176, 176, 176)
 
-        fun updateWidgets(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        fun updateWidgets(
+            context: Context,
+            manager: AppWidgetManager,
+            ids: IntArray
+        ) {
             val summary = ExpenseDataUtils.summary(context)
+
             ids.forEach { id ->
                 val options = manager.getAppWidgetOptions(id)
                 val layout = chooseLayout(options)
-                val views = RemoteViews(context.packageName, layout)
+                val views = RemoteViews(
+                    context.packageName,
+                    layout
+                )
+
                 bindCommon(context, views, summary)
+
                 when (layout) {
-                    R.layout.widget_4x1 -> bind4x1(views, summary)
-                    R.layout.widget_2x2 -> bind2x2(views, summary)
-                    R.layout.widget_3x2 -> bindFull(views, summary, maxItems = 2)
-                    R.layout.widget_5x2 -> bindFull(views, summary, maxItems = 9)
-                    else -> bindFull(views, summary, maxItems = 9)
+                    R.layout.widget_4x1 -> {
+                        bind4x1(views, summary)
+                    }
+
+                    R.layout.widget_2x2 -> {
+                        bind2x2(views, summary)
+                    }
+
+                    R.layout.widget_3x2 -> {
+                        bindFull(
+                            views,
+                            summary,
+                            maxItems = 2
+                        )
+                    }
+
+                    R.layout.widget_5x2 -> {
+                        bindFull(
+                            views,
+                            summary,
+                            maxItems = 9
+                        )
+                    }
+
+                    else -> {
+                        bindFull(
+                            views,
+                            summary,
+                            maxItems = 9
+                        )
+                    }
                 }
+
                 manager.updateAppWidget(id, views)
             }
         }
 
         private fun chooseLayout(options: Bundle?): Int {
-            // Launcher sizes are reported in dp. These non-overlapping bands ensure
-            // resizing selects one of the dedicated 2×2, 3×2, 4×1, 4×2 or 5×2 layouts.
-            val minW = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 250) ?: 250
-            val minH = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110) ?: 110
+            val minW = options?.getInt(
+                AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,
+                250
+            ) ?: 250
+
+            val minH = options?.getInt(
+                AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,
+                110
+            ) ?: 110
+
             return when {
-                minH <= 92 && minW >= 180 -> R.layout.widget_4x1
-                minW < 155 -> R.layout.widget_2x2
-                minW < 235 -> R.layout.widget_3x2
-                minW >= 300 -> R.layout.widget_5x2
-                else -> R.layout.widget_4x2
+                minH <= 92 && minW >= 180 -> {
+                    R.layout.widget_4x1
+                }
+
+                minW < 155 -> {
+                    R.layout.widget_2x2
+                }
+
+                minW < 235 -> {
+                    R.layout.widget_3x2
+                }
+
+                minW >= 300 -> {
+                    R.layout.widget_5x2
+                }
+
+                else -> {
+                    R.layout.widget_4x2
+                }
             }
         }
 
-        fun bindCommon(context: Context, views: RemoteViews, summary: ExpenseDataUtils.WidgetSummary) {
-            val openIntent = Intent(context, MainActivity::class.java).apply {
-                action = "ir.ramezani.expensenotebook.OPEN_FROM_WIDGET_${summary.mode}"
-                putExtra(MainActivity.EXTRA_OPEN_MODE, summary.mode)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            // باز شدن کامل اپ فقط با دابل‌تپ روی بدنهٔ ویجت انجام می‌شود.
-            // دکمه‌های + و ⚙ همچنان با یک تپ کار می‌کنند.
-            val bodyTapIntent = Intent(context, ExpenseWidgetProvider::class.java).apply {
+        fun bindCommon(
+            context: Context,
+            views: RemoteViews,
+            summary: ExpenseDataUtils.WidgetSummary
+        ) {
+            val bodyTapIntent = Intent(
+                context,
+                ExpenseWidgetProvider::class.java
+            ).apply {
                 action = ACTION_WIDGET_BODY_TAP
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
+
+                putExtra(
+                    AppWidgetManager.EXTRA_APPWIDGET_ID,
+                    0
+                )
             }
+
             val bodyTapPending = PendingIntent.getBroadcast(
                 context,
                 10,
@@ -113,12 +206,19 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or immutableFlag()
             )
 
-            val addIntent = Intent(context, QuickAddActivity::class.java).apply {
-                action = "ir.ramezani.expensenotebook.QUICK_ADD"
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+            val addIntent = Intent(
+                context,
+                QuickAddActivity::class.java
+            ).apply {
+                action =
+                    "ir.ramezani.expensenotebook.QUICK_ADD"
+
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
+
             val addPending = PendingIntent.getActivity(
                 context,
                 20,
@@ -126,12 +226,19 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or immutableFlag()
             )
 
-            val settingsIntent = Intent(context, WidgetSettingsActivity::class.java).apply {
-                action = "ir.ramezani.expensenotebook.WIDGET_SETTINGS"
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+            val settingsIntent = Intent(
+                context,
+                WidgetSettingsActivity::class.java
+            ).apply {
+                action =
+                    "ir.ramezani.expensenotebook.WIDGET_SETTINGS"
+
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
+
             val settingsPending = PendingIntent.getActivity(
                 context,
                 30,
@@ -139,93 +246,293 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or immutableFlag()
             )
 
-            views.setOnClickPendingIntent(R.id.widget_root, bodyTapPending)
-            views.setOnClickPendingIntent(R.id.widget_plus, addPending)
-            views.setOnClickPendingIntent(R.id.widget_gear, settingsPending)
+            views.setOnClickPendingIntent(
+                R.id.widget_root,
+                bodyTapPending
+            )
+
+            views.setOnClickPendingIntent(
+                R.id.widget_plus,
+                addPending
+            )
+
+            views.setOnClickPendingIntent(
+                R.id.widget_gear,
+                settingsPending
+            )
         }
 
-        fun bindFixed(context: Context, views: RemoteViews, s: ExpenseDataUtils.WidgetSummary, layout: Int) {
-            bindCommon(context, views, s)
+        fun bindFixed(
+            context: Context,
+            views: RemoteViews,
+            summary: ExpenseDataUtils.WidgetSummary,
+            layout: Int
+        ) {
+            bindCommon(context, views, summary)
+
             when (layout) {
-                R.layout.widget_2x2 -> bind2x2(views, s)
-                R.layout.widget_4x1 -> bind4x1(views, s)
-                R.layout.widget_3x2 -> bindFull(views, s, 2)
-                else -> bindFull(views, s, 9)
-            }
-        }
-
-        private fun bindFull(views: RemoteViews, s: ExpenseDataUtils.WidgetSummary, maxItems: Int) {
-            views.setTextViewText(R.id.widget_date_primary, richPrimaryDate(s))
-            views.setTextViewText(R.id.widget_date_secondary, s.secondaryDate)
-            views.setTextViewText(R.id.widget_label, s.label)
-            views.setTextViewText(R.id.widget_total, ExpenseDataUtils.formatNumber(s.total))
-            views.setTextViewText(R.id.widget_items, richItemsLine(s, maxItems))
-        }
-
-        private fun bind4x1(views: RemoteViews, s: ExpenseDataUtils.WidgetSummary) {
-            views.setTextViewText(R.id.widget_date_primary, richPrimaryDate(s))
-            views.setTextViewText(R.id.widget_date_secondary, s.secondaryDate)
-            views.setTextViewText(R.id.widget_label, s.label)
-            views.setTextViewText(R.id.widget_total, ExpenseDataUtils.formatNumber(s.total))
-        }
-
-        private fun bind2x2(views: RemoteViews, s: ExpenseDataUtils.WidgetSummary) {
-            views.setTextViewText(R.id.widget_date_primary, richPrimaryDate(s))
-            views.setTextViewText(R.id.widget_date_secondary, s.secondaryDate)
-            views.setTextViewText(R.id.widget_label, s.label)
-            views.setTextViewText(R.id.widget_total, ExpenseDataUtils.formatNumber(s.total))
-            views.setTextViewText(R.id.widget_count, ExpenseDataUtils.toPersianDigits(s.count.toString()) + " مورد")
-        }
-
-        private fun richPrimaryDate(s: ExpenseDataUtils.WidgetSummary): CharSequence {
-            val b = SpannableStringBuilder()
-            val parts = s.primaryDate.split("|", limit = 2)
-            val startDay = b.length
-            b.append(parts[0].trim())
-            b.setSpan(ForegroundColorSpan(DATE_GREY), startDay, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            if (s.mode == ExpenseDataUtils.MODE_DAY || !s.primaryDate.contains("|")) return b
-            val sepStart = b.length
-            b.append("  |  ")
-            b.setSpan(ForegroundColorSpan(LIGHT), sepStart, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            b.append(parts.getOrElse(1) { "" }.trim())
-            return b
-        }
-
-        private fun richItemsLine(s: ExpenseDataUtils.WidgetSummary, maxItems: Int): CharSequence {
-            if (s.expenses.isEmpty()) return s.itemsLine
-            val latest = s.expenses.sortedByDescending { it.idx }.take(maxItems)
-            val b = SpannableStringBuilder()
-            latest.forEachIndexed { index, item ->
-                // سه ردیفِ منظم؛ هر ردیف حداکثر سه عنوان را نشان می‌دهد.
-                if (index > 0) {
-                    if (index % 3 == 0) b.append('\n') else appendSeparator(b)
+                R.layout.widget_2x2 -> {
+                    bind2x2(views, summary)
                 }
-                val titleStart = b.length
-                b.append(trimForWidget(item.title, 7)).append(' ')
-                b.setSpan(ForegroundColorSpan(Color.rgb(102, 102, 102)), titleStart, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                val priceStart = b.length
-                b.append(ExpenseDataUtils.formatNumber(item.price))
-                b.setSpan(ForegroundColorSpan(TEXT_DARK), priceStart, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                b.setSpan(StyleSpan(Typeface.BOLD), priceStart, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                R.layout.widget_4x1 -> {
+                    bind4x1(views, summary)
+                }
+
+                R.layout.widget_3x2 -> {
+                    bindFull(views, summary, 2)
+                }
+
+                else -> {
+                    bindFull(views, summary, 9)
+                }
             }
-            val remaining = s.expenses.size - latest.size
+        }
+
+        private fun bindFull(
+            views: RemoteViews,
+            summary: ExpenseDataUtils.WidgetSummary,
+            maxItems: Int
+        ) {
+            views.setTextViewText(
+                R.id.widget_date_primary,
+                richPrimaryDate(summary)
+            )
+
+            views.setTextViewText(
+                R.id.widget_date_secondary,
+                summary.secondaryDate
+            )
+
+            views.setTextViewText(
+                R.id.widget_label,
+                summary.label
+            )
+
+            views.setTextViewText(
+                R.id.widget_total,
+                ExpenseDataUtils.formatNumber(summary.total)
+            )
+
+            views.setTextViewText(
+                R.id.widget_items,
+                richItemsLine(summary, maxItems)
+            )
+        }
+
+        private fun bind4x1(
+            views: RemoteViews,
+            summary: ExpenseDataUtils.WidgetSummary
+        ) {
+            views.setTextViewText(
+                R.id.widget_date_primary,
+                richPrimaryDate(summary)
+            )
+
+            views.setTextViewText(
+                R.id.widget_date_secondary,
+                summary.secondaryDate
+            )
+
+            views.setTextViewText(
+                R.id.widget_label,
+                summary.label
+            )
+
+            views.setTextViewText(
+                R.id.widget_total,
+                ExpenseDataUtils.formatNumber(summary.total)
+            )
+        }
+
+        private fun bind2x2(
+            views: RemoteViews,
+            summary: ExpenseDataUtils.WidgetSummary
+        ) {
+            views.setTextViewText(
+                R.id.widget_date_primary,
+                richPrimaryDate(summary)
+            )
+
+            views.setTextViewText(
+                R.id.widget_date_secondary,
+                summary.secondaryDate
+            )
+
+            views.setTextViewText(
+                R.id.widget_label,
+                summary.label
+            )
+
+            views.setTextViewText(
+                R.id.widget_total,
+                ExpenseDataUtils.formatNumber(summary.total)
+            )
+        }
+
+        private fun richPrimaryDate(
+            summary: ExpenseDataUtils.WidgetSummary
+        ): CharSequence {
+            val builder = SpannableStringBuilder()
+            val parts = summary.primaryDate.split(
+                "|",
+                limit = 2
+            )
+
+            val startDay = builder.length
+
+            builder.append(parts[0].trim())
+
+            builder.setSpan(
+                ForegroundColorSpan(DATE_GREY),
+                startDay,
+                builder.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            if (
+                summary.mode == ExpenseDataUtils.MODE_DAY ||
+                !summary.primaryDate.contains("|")
+            ) {
+                return builder
+            }
+
+            val separatorStart = builder.length
+
+            builder.append("  |  ")
+
+            builder.setSpan(
+                ForegroundColorSpan(LIGHT),
+                separatorStart,
+                builder.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            builder.append(
+                parts.getOrElse(1) { "" }.trim()
+            )
+
+            return builder
+        }
+
+        private fun richItemsLine(
+            summary: ExpenseDataUtils.WidgetSummary,
+            maxItems: Int
+        ): CharSequence {
+            if (summary.expenses.isEmpty()) {
+                return summary.itemsLine
+            }
+
+            val latest = summary.expenses
+                .sortedByDescending { it.idx }
+                .take(maxItems)
+
+            val builder = SpannableStringBuilder()
+
+            latest.forEachIndexed { index, item ->
+
+                if (index > 0) {
+                    if (index % 3 == 0) {
+                        builder.append('\n')
+                    } else {
+                        appendSeparator(builder)
+                    }
+                }
+
+                val titleStart = builder.length
+
+                builder
+                    .append(trimForWidget(item.title, 7))
+                    .append(' ')
+
+                builder.setSpan(
+                    ForegroundColorSpan(Color.rgb(102, 102, 102)),
+                    titleStart,
+                    builder.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                val priceStart = builder.length
+
+                builder.append(
+                    ExpenseDataUtils.formatNumber(item.price)
+                )
+
+                builder.setSpan(
+                    ForegroundColorSpan(TEXT_DARK),
+                    priceStart,
+                    builder.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                builder.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    priceStart,
+                    builder.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+
+            val remaining = summary.expenses.size - latest.size
+
             if (remaining > 0) {
-                appendSeparator(b)
-                val rStart = b.length
-                b.append('⁺').append(ExpenseDataUtils.toPersianDigits(remaining.toString()))
-                b.setSpan(ForegroundColorSpan(MUTED), rStart, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                appendSeparator(builder)
+
+                val remainingStart = builder.length
+
+                builder
+                    .append('⁺')
+                    .append(
+                        ExpenseDataUtils.toPersianDigits(
+                            remaining.toString()
+                        )
+                    )
+
+                builder.setSpan(
+                    ForegroundColorSpan(MUTED),
+                    remainingStart,
+                    builder.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
-            return b
+
+            return builder
         }
 
-        private fun appendSeparator(b: SpannableStringBuilder) {
-            val st = b.length
-            b.append("  |  ")
-            b.setSpan(ForegroundColorSpan(LIGHT), st, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        private fun appendSeparator(
+            builder: SpannableStringBuilder
+        ) {
+            val start = builder.length
+
+            builder.append("  |  ")
+
+            builder.setSpan(
+                ForegroundColorSpan(LIGHT),
+                start,
+                builder.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
 
-        private fun trimForWidget(s: String, max: Int): String = if (s.length <= max) s else s.take(max - 1) + "…"
+        private fun trimForWidget(
+            value: String,
+            max: Int
+        ): String {
+            return if (value.length <= max) {
+                value
+            } else {
+                value.take(max - 1) + "…"
+            }
+        }
 
-        private fun immutableFlag(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        private fun immutableFlag(): Int {
+            return if (
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            ) {
+                PendingIntent.FLAG_IMMUTABLE
+            } else {
+                0
+            }
+        }
     }
 }
